@@ -1,0 +1,3 @@
+workspace_name: myworkspace
+deployment_target: aks
+aks_cluster: lunav2aks

@@ -1,0 +1,20 @@
+MLproject: MLproject
+supported_run_mode: local,azureml,mlflow
+run_mode: azureml
+project_type: train_your_own_model
+conda_env: conda.yml
+deploy_config: .parameters/deploy/deploy_config.yml
+code:
+  deployment: 'src/luna_publish/deploy.py'
+  score: 'src/luna_publish/score.py'
+  training: 'src/luna_publish/train.py'
+  batchinference: 'src/luna_publish/batchinference.py'
+azureml:
+  run_config: .cloud/.azureml/aml_run_config.yml
+  workspace_config: .cloud/.azureml/compute.yml
+  test_workspace_path: .cloud/.azureml
+  test_workspace_file_name: test_workspace.json
+mlflow:
+  spark_config: .cloud/.mlflow/spark_config.json
+  workspace_config: .cloud/.mlflow/compute.yml
+  test_experiment: .cloud/.mlflow/test_experiment.yml

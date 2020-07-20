@@ -1,0 +1,21 @@
+{
+    "training_user_input": {
+        "trainingDataSource": "https://xiwutestai.blob.core.windows.net/lunav2/BostonHousing/Boston_all_with_header.csv?st=2020-07-09T16%3A56%3A37Z&se=2022-06-14T16%3A56%3A00Z&sp=rl&sv=2018-03-28&sr=b&sig=dtfuzYkXsAcA5udyZhb8E64zJYvyHikriMaN690cFP4%3D",
+        "labelColumnName": "medv",
+        "description": "boston housing price prediction"
+    },
+    "batch_inference_input": {
+        "dataSource": "https://xiwutestai.blob.core.windows.net/lunav2/BostonHousing/Boston_all_no_label_with_header.csv?st=2020-07-09T20%3A20%3A01Z&se=2023-10-17T20%3A20%3A00Z&sp=rl&sv=2018-03-28&sr=b&sig=gpJvtYU5%2FTOotLooNw3cdDJ2wFn76phtSNM4DDIiBFA%3D", 
+        "output": "https://xiwutestai.blob.core.windows.net/lunav2/BostonHousing/result.csv?st=2020-07-02T15%3A58%3A34Z&se=2022-11-17T15%3A58%3A00Z&sp=racwdl&sv=2018-03-28&sr=c&sig=bKXiZemBEyLVzg1sLxyxbo0WHHEq%2FXDfnMbOJ%2B1%2FnuY%3D"
+    },
+    "real_time_scoring_input": {
+        "records":
+        [
+            [0.00632,18,2.31,0,0.538,6.575,65.2,4.09,1,296,15.3,396.9,4.98],
+            [0.03237,0,2.18,0,0.458,6.998,45.8,6.0622,3,222,18.7,394.63,2.94]
+        ]
+    },
+    "real_time_scoring_expected_output": {
+
+    }
+}

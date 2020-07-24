@@ -11,13 +11,13 @@ dependencies:
 - python=3.6.2
 
 - pip:
-  - azureml-sdk==1.0.83.*
+  - azureml-sdk==1.10.0
   - azureml-defaults>=1.0.45
   - luna-publish-utils>=0.3.10
   - pyyaml
   - inference-schema[numpy-support]
   - mlflow
+  - azureml-contrib-services
   # Add pip packages used in your project
-  - sklearn
 channels:
 - conda-forge

@@ -32,14 +32,18 @@ def publish(azureml_workspace, entry_point, name, description, parameters={}):
 if __name__ == "__main__":
     ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
 
+    training_pipeline_name = 'sklearniristraining'
+    batch_inference_pipeline_name = 'sklearnirisbatchinference'
+    deployment_pipeline_name = 'sklearnirisdeployment'
+
     print('publishing training pipeline')
-    endpoint = publish(ws, 'training', 'lunaaitrainingpipeline', 'The training pipeline')
+    endpoint = publish(ws, 'training', training_pipeline_name, 'The training pipeline')
     print('training pipeline published with endpoint {}'.format(endpoint))
     
     print('publishing batchinference pipeline')
-    endpoint = publish(ws, 'batchinference', 'lunaaibatchinferencepipeline', 'The batchinference pipeline')
+    endpoint = publish(ws, 'batchinference', batch_inference_pipeline_name, 'The batchinference pipeline')
     print('batchinference pipeline published with endpoint {}'.format(endpoint))
     
     print('publishing deployment pipeline')
-    endpoint = publish(ws, 'deployment', 'lunaaideploymentpipeline', 'The deployment pipeline')
+    endpoint = publish(ws, 'deployment', deployment_pipeline_name, 'The deployment pipeline')
     print('deployment pipeline published with endpoint {}'.format(endpoint))

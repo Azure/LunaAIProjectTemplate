@@ -34,8 +34,7 @@ dns_name_label = 'testlabel'
 def init():
     global ws, modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data
     ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
-    #modelId = str('a' + uuid4().hex[1:])
-    modelId = "a10ef072f4954586aff6b14740b5240f"
+    modelId = str('a' + uuid4().hex[1:])
     endpointId = str('a' + uuid4().hex[1:])
     operationId = str('a' + uuid4().hex[1:])
     subscriptionId = str('a' + uuid4().hex)[1:]
@@ -125,7 +124,7 @@ def trace_run_by_tags(run_id, tags):
     if run.status != 'Completed':
         raise Exception('Run completed with result:' + run.status)
 
-def test_deployed_aci_service(data):
+def test_deployed_aci_service(data, expected_output):
     webservice = AciWebservice(ws, endpointId)
     headers = {'Content-Type': 'application/json'}
     headers['Authorization'] = 'Bearer '+webservice.get_keys()[0]
@@ -136,20 +135,19 @@ def test_deployed_aci_service(data):
     webservice.scoring_uri, data=test_sample, headers=headers)
     if response.status_code != 200:
         raise Exception('The service return non-success status code: {}'.format(response.status_code))
-    if response.json() != test_sample:
+    if response.json() != expected_output:
         raise Exception('The scoring result is incorrect: {}'.format(response.json()))
 
 if __name__ == "__main__":
     init()
-    """
+    
     run_id = trainModel(userInput=json.dumps(test_data['training_user_input']))
     trace_run_by_tags(run_id, tags={'modelId': modelId, 'userId': userId, 'subscriptionId': subscriptionId})
     run_id = batchInference(userInput=json.dumps(test_data['batch_inference_input']))
     trace_run_by_tags(run_id, tags={'operationId': operationId, 'userId': userId, 'subscriptionId': subscriptionId})
 
-    """
     userInput = '{{"dns_name_label":"{}"}}'.format(dns_name_label)
     run_id = deploy(userInput=userInput)
     trace_run_by_tags(run_id, tags={'endpointId': endpointId, 'userId': userId, 'subscriptionId': subscriptionId})
 
-    test_deployed_aci_service(data=test_data['real_time_scoring_input'])
+    test_deployed_aci_service(data=test_data['real_time_scoring_input'], expected_output=test_data['real_time_scoring_expected_output'])

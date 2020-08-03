@@ -17,6 +17,7 @@ from uuid import uuid4
 import requests
 import json
 import pathlib
+import argparse
 
 modelId = '00000000-0000-0000-0000-000000000000'
 endpointId = '00000000-0000-0000-0000-000000000000'
@@ -31,7 +32,7 @@ apiVersion = 'v1.0'
 ws = None
 dns_name_label = 'testlabel'
 
-def init():
+def init(test_data_file):
     global ws, modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data
     ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
     modelId = str('a' + uuid4().hex[1:])
@@ -44,7 +45,8 @@ def init():
     print('operationId {}'.format(operationId))
     print('subscriptionId {}'.format(subscriptionId))
     print('dns_name_label {}'.format(dns_name_label))
-    test_data_file = os.path.join(pathlib.Path(__file__).parent.absolute(), "test_data.json")
+    if test_data_file == "default":
+        test_data_file = os.path.join(pathlib.Path(__file__).parent.absolute(), "test_data.json")
     with open(test_data_file) as f:
         test_data = json.load(f)
 
@@ -142,7 +144,18 @@ def test_deployed_aci_service(data, expected_output):
         raise Exception('The scoring result is incorrect: {}'.format(response.json()))
 
 if __name__ == "__main__":
-    init()
+    
+    parser=argparse.ArgumentParser(description="Test AML pipelines") 
+
+    parser.add_argument('-test_data_file_path', 
+                        '--test_data_file_path', 
+                        help="The file path of test data", 
+                        default="default",
+                        type=str)  
+
+    args=parser.parse_args()
+
+    init(args.test_data_file_path)
     
     run_id = trainModel(userInput=json.dumps(test_data['training_user_input']))
     trace_run_by_tags(run_id, tags={'modelId': modelId, 'userId': userId, 'subscriptionId': subscriptionId})

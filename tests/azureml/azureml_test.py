@@ -18,6 +18,7 @@ import requests
 import json
 import pathlib
 import argparse
+import time
 
 modelId = '00000000-0000-0000-0000-000000000000'
 endpointId = '00000000-0000-0000-0000-000000000000'
@@ -52,15 +53,16 @@ def init(test_data_file):
 
 def trainModel(userInput='{}'):
     run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'training', 
+                                    entry_point = 'train', 
                                     experiment_name = experimentName, 
-                                    parameters={'modelId': modelId, 
+                                    parameters={'userId': userId,
                                                 'userInput': userInput, 
-                                                'operationId': operationId,
+                                                'operationId': modelId,
                                                 'productName': productName,
                                                 'deploymentName': deploymentName,
                                                 'apiVersion': apiVersion,
-                                                'subscriptionId': subscriptionId}, 
+                                                'subscriptionId': subscriptionId,
+                                                'predecessorOperationId': 'na'}, 
                                     tags={'userId': userId, 
                                             'productName': productName, 
                                             'deploymentName': deploymentName, 
@@ -75,10 +77,14 @@ def batchInference(userInput='{}'):
     run_id = utils.RunProject(azureml_workspace = ws, 
                                     entry_point = 'batchinference', 
                                     experiment_name = experimentName, 
-                                    parameters={'modelId': modelId, 
+                                    parameters={'userId': userId,
                                                 'userInput': userInput, 
                                                 'operationId': operationId,
-                                                'subscriptionId': subscriptionId}, 
+                                                'productName': productName,
+                                                'deploymentName': deploymentName,
+                                                'apiVersion': apiVersion,
+                                                'subscriptionId': subscriptionId,
+                                                'predecessorOperationId': modelId}, 
                                     tags={'userId': userId, 
                                             'productName': productName, 
                                             'deploymentName': deploymentName, 
@@ -91,15 +97,16 @@ def batchInference(userInput='{}'):
 
 def deploy(userInput='{"dns_name_label":"testlabel"}'):
     run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'deployment', 
+                                    entry_point = 'deploy', 
                                     experiment_name = experimentName, 
-                                    parameters={'modelId': modelId, 
+                                    parameters={'userId': userId,
                                                 'userInput': userInput, 
-                                                'endpointId': endpointId,
+                                                'operationId': operationId,
                                                 'productName': productName,
                                                 'deploymentName': deploymentName,
                                                 'apiVersion': apiVersion,
-                                                'subscriptionId': subscriptionId}, 
+                                                'subscriptionId': subscriptionId,
+                                                'predecessorOperationId': modelId}, 
                                     tags={'userId': userId, 
                                             'productName': productName, 
                                             'deploymentName': deploymentName, 
@@ -121,6 +128,8 @@ def wait_for_run_completion(run):
     run.wait_for_completion(show_output=True)
 
 def trace_run_by_tags(run_id, tags):
+    print(tags)
+    time.sleep(5)
     run = get_run_by_tags(tags)
     if run.id != run_id:
         raise Exception('Found the wrong run. Expected run id: {}, actual run id: {}'.format(run_id, run.id))

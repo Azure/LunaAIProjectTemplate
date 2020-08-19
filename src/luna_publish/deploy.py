@@ -8,5 +8,5 @@ from azureml.core.webservice import AksWebservice, AciWebservice, Webservice
 
 import os
 
-utils = LunaUtils.Create(run_type = 'deployment')
+utils = LunaUtils.Create()
 utils.DeployModel()

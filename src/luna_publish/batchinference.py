@@ -3,7 +3,7 @@ import os
 
 from LunaPythonModel import LunaPythonModel
 
-utils = LunaUtils.Create(run_type = 'batchinference')
+utils = LunaUtils.Create()
 args = utils.args
 user_input = utils.user_input
 

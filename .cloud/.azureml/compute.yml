@@ -1,3 +1,4 @@
 workspace_name: myworkspace
 deployment_target: aci
 aks_cluster: lunav2aks
+aml_cluster: lunaamlcompute

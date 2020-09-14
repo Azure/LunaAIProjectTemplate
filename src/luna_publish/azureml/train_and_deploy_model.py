@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     with open(input_data_file) as f:
         trainingUserInput = f.read()
-
+    trainingUserInput = trainingUserInput.replace(" ", "").replace("\n", "").replace("\r", "")
     print(trainingUserInput)
     
     deploymentUserInput = json.dumps({"dns_name_label": serviceEndpointDnsNameLabel})
@@ -76,9 +76,9 @@ if __name__ == "__main__":
     
     ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
     run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'training', 
+                                    entry_point = 'train', 
                                     experiment_name = experimentName, 
-                                    parameters={'modelId': modelId, 
+                                    parameters={'operationId': modelId, 
                                                 'userInput': trainingUserInput}, 
                                     tags={})
     
@@ -86,11 +86,11 @@ if __name__ == "__main__":
     run.wait_for_completion(show_output = False)
     
     run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'deployment', 
+                                    entry_point = 'deploy', 
                                     experiment_name = experimentName, 
-                                    parameters={'modelId': modelId, 
+                                    parameters={'predecessorOperationId': modelId, 
                                                 'userInput': deploymentUserInput, 
-                                                'endpointId': endpointId}, 
+                                                'operationId': endpointId}, 
                                     tags={})
     
     run = Run(exp, run_id)

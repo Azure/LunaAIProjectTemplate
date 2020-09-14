@@ -10,13 +10,13 @@ entry_points:
     parameters:
       runMode: {type: string, default: 'default'}
       userInput: {type: string, default: '{}'}
-      userId: {type: string, default: ''}
-      operationId: {type: string, default: ''}
-      predecessorOperationId: {type: string, default: ''}
-      productName: {type: string, default: ''}
-      deploymentName: {type: string, default: ''}
-      apiVersion: {type: string, default: ''}
-      subscriptionId: {type: string, default: ''}
+      userId: {type: string, default: 'default'}
+      operationId: {type: string, default: 'default'}
+      predecessorOperationId: {type: string, default: 'default'}
+      productName: {type: string, default: 'default'}
+      deploymentName: {type: string, default: 'default'}
+      apiVersion: {type: string, default: 'default'}
+      subscriptionId: {type: string, default: 'default'}
     successors: 
       - batchinference
       - deploy
@@ -28,13 +28,13 @@ entry_points:
     parameters:
       runMode: {type: string, default: 'default'}
       userInput: {type: string, default: '{}'}
-      userId: {type: string, default: ''}
-      operationId: {type: string, default: ''}
-      predecessorOperationId: {type: string, default: ''}
-      productName: {type: string, default: ''}
-      deploymentName: {type: string, default: ''}
-      apiVersion: {type: string, default: ''}
-      subscriptionId: {type: string, default: ''}
+      userId: {type: string, default: 'default'}
+      operationId: {type: string, default: 'default'}
+      predecessorOperationId: {type: string, default: 'default'}
+      productName: {type: string, default: 'default'}
+      deploymentName: {type: string, default: 'default'}
+      apiVersion: {type: string, default: 'default'}
+      subscriptionId: {type: string, default: 'default'}
     successros:
     verb: batchinference
     noun: inferenceresult
@@ -44,13 +44,13 @@ entry_points:
     parameters:
       runMode: {type: string, default: 'default'}
       userInput: {type: string, default: '{}'}
-      userId: {type: string, default: ''}
-      operationId: {type: string, default: ''}
-      predecessorOperationId: {type: string, default: ''}
-      productName: {type: string, default: ''}
-      deploymentName: {type: string, default: ''}
-      apiVersion: {type: string, default: ''}
-      subscriptionId: {type: string, default: ''}
+      userId: {type: string, default: 'default'}
+      operationId: {type: string, default: 'default'}
+      predecessorOperationId: {type: string, default: 'default'}
+      productName: {type: string, default: 'default'}
+      deploymentName: {type: string, default: 'default'}
+      apiVersion: {type: string, default: 'default'}
+      subscriptionId: {type: string, default: 'default'}
     successros:
     verb: deploy
     noun: endpoints

@@ -14,7 +14,7 @@ dependencies:
 - pip:
   - azureml-sdk==1.10.0
   - azureml-defaults>=1.0.45
-  - luna-publish-utils>=0.5.0
+  - luna-publish-utils>=0.5.9
   - pyyaml
   - inference-schema[numpy-support]
   - mlflow

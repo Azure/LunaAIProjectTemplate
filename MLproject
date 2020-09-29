@@ -55,4 +55,4 @@ entry_points:
     verb: deploy
     noun: endpoints
     output: json
-    command: "python src/luna_publish/train.py --runMode {runMode} --userInput {userInput} --userId {userId} --operationId {operationId} --predecessorOperationId {predecessorOperationId} --productName {productName} --deploymentName {deploymentName} --apiVersion {apiVersion} --subscriptionId {subscriptionId}"
+    command: "python src/luna_publish/deploy.py --runMode {runMode} --userInput {userInput} --userId {userId} --operationId {operationId} --predecessorOperationId {predecessorOperationId} --productName {productName} --deploymentName {deploymentName} --apiVersion {apiVersion} --subscriptionId {subscriptionId}"

@@ -1,7 +1,7 @@
 from azureml.core import model
 from azureml.core.webservice.aci import AciWebservice
 from azureml.core.webservice.aks import AksWebservice
-from luna import utils
+from luna.utils import ProjectUtils
 from azureml.core import Workspace, Experiment, Run
 from azureml.core.webservice import Webservice
 from uuid import uuid4
@@ -70,41 +70,35 @@ if __name__ == "__main__":
     print(trainingUserInput)
     
     deploymentUserInput = json.dumps({"dns_name_label": serviceEndpointDnsNameLabel})
-    
-    ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
-    exp = Experiment(ws, experimentName)
-    
-    ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
-    run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'train', 
+        
+    utils = ProjectUtils(luna_config_file='luna_config.yml', run_mode='default')
+
+    run_id = utils.RunProject(entry_point = 'train', 
                                     experiment_name = experimentName, 
                                     parameters={'operationId': modelId, 
                                                 'userInput': trainingUserInput}, 
                                     tags={})
     
-    run = Run(exp, run_id)
-    run.wait_for_completion(show_output = False)
+    utils.WaitForRunCompletion(run_id, experimentName)
     
-    run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'deploy', 
+    run_id = utils.RunProject(entry_point = 'deploy', 
                                     experiment_name = experimentName, 
                                     parameters={'predecessorOperationId': modelId, 
                                                 'userInput': deploymentUserInput, 
                                                 'operationId': endpointId}, 
                                     tags={})
     
-    run = Run(exp, run_id)
-    run.wait_for_completion(show_output = False)
+    utils.WaitForRunCompletion(run_id, experimentName)
     
-    webservice = Webservice(ws, endpointId)
+    webservice = utils.GetServiceEndpoint(endpointId)
     
     if (webservice.compute_type == 'ACI'):
-        aciWebservice = AciWebservice(ws, endpointId)
+        aciWebservice = utils.GetAciServiceEndpoint(endpointId)
         print("The model {} was deployed to a ACI service endpoint.".format(modelId))
         print("The scoring URL is: {}".format(aciWebservice.scoring_uri))
         print("The primary authentication key is: {}".format(aciWebservice.get_keys()[0]))
     elif (webservice.compute_type == 'AKS'):
-        aksWebservice = AksWebservice(ws, endpointId)
+        aksWebservice = utils.GetAksServiceEndpoint(endpointId)
         print("The model {} was deployed to a AKS service endpoint.".format(modelId))
         print("The scoring URL is: {}".format(aksWebservice.scoring_uri))
         print("The primary authentication key is: {}".format(aksWebservice.get_keys()[0]))

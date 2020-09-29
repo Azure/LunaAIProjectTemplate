@@ -5,10 +5,7 @@ project_type: train_your_own_model
 conda_env: conda.yml
 deploy_config: .cloud/.azureml/deploy_config.yml
 code:
-  deploy: 'src/luna_publish/deploy.py'
-  score: 'src/luna_publish/score.py'
-  train: 'src/luna_publish/train.py'
-  batchinference: 'src/luna_publish/batchinference.py'
+  inference_entry_script: 'src/luna_publish/score.py'
 azureml:
   run_config: .cloud/.azureml/aml_run_config.yml
   test_workspace_path: .cloud/.azureml

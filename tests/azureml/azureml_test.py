@@ -11,7 +11,7 @@ from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.runconfig import DEFAULT_CPU_IMAGE
 from uuid import uuid4
 
-from luna import utils
+from luna.utils import ProjectUtils
 import os
 from uuid import uuid4
 import requests
@@ -32,10 +32,11 @@ deploymentName = 'westus'
 apiVersion = 'v1.0'
 ws = None
 dns_name_label = 'testlabel'
+utils = None
 
 def init(test_data_file):
-    global ws, modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data
-    ws = Workspace.from_config(path='.cloud/.azureml/', _file_name='test_workspace.json')
+    global modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data
+    utils = ProjectUtils(luna_config_file='luna_config.yml', run_mode='default')
     modelId = str('a' + uuid4().hex[1:])
     endpointId = str('a' + uuid4().hex[1:])
     operationId = str('a' + uuid4().hex[1:])
@@ -74,8 +75,7 @@ def trainModel(userInput='{}'):
     return run_id
 
 def batchInference(userInput='{}'):
-    run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'batchinference', 
+    run_id = utils.RunProject(entry_point = 'batchinference', 
                                     experiment_name = experimentName, 
                                     parameters={'userId': userId,
                                                 'userInput': userInput, 
@@ -96,8 +96,7 @@ def batchInference(userInput='{}'):
     return run_id
 
 def deploy(userInput='{"dns_name_label":"testlabel"}'):
-    run_id = utils.RunProject(azureml_workspace = ws, 
-                                    entry_point = 'deploy', 
+    run_id = utils.RunProject(entry_point = 'deploy', 
                                     experiment_name = experimentName, 
                                     parameters={'userId': userId,
                                                 'userInput': userInput, 
@@ -116,27 +115,6 @@ def deploy(userInput='{"dns_name_label":"testlabel"}'):
                                             'endpointId': endpointId})
     print(run_id)
     return run_id
-
-def get_run_by_tags(tags):
-    exp = Experiment(ws, experimentName)
-    runs = exp.get_runs(type='azureml.PipelineRun', tags=tags)
-    run = next(runs)
-    print(run.status)
-    return run
-
-def wait_for_run_completion(run):
-    run.wait_for_completion(show_output=True)
-
-def trace_run_by_tags(run_id, tags):
-    print(tags)
-    time.sleep(5)
-    run = get_run_by_tags(tags)
-    if run.id != run_id:
-        raise Exception('Found the wrong run. Expected run id: {}, actual run id: {}'.format(run_id, run.id))
-    wait_for_run_completion(run)
-    run = get_run_by_tags({'modelId': modelId, 'userId': userId, 'subscriptionId': subscriptionId})
-    if run.status != 'Completed':
-        raise Exception('Run completed with result:' + run.status)
 
 def test_deployed_aci_service(data, expected_output):
     webservice = AciWebservice(ws, endpointId)
@@ -167,12 +145,13 @@ if __name__ == "__main__":
     init(args.test_data_file_path)
     
     run_id = trainModel(userInput=json.dumps(test_data['training_user_input']))
-    trace_run_by_tags(run_id, tags={'modelId': modelId, 'userId': userId, 'subscriptionId': subscriptionId})
+
+    utils.WaitForRunCompletionByTags(experimentName, tags={'modelId': modelId, 'userId': userId, 'subscriptionId': subscriptionId})
     run_id = batchInference(userInput=json.dumps(test_data['batch_inference_input']))
-    trace_run_by_tags(run_id, tags={'operationId': operationId, 'userId': userId, 'subscriptionId': subscriptionId})
+    utils.WaitForRunCompletionByTags(experimentName, tags={'operationId': operationId, 'userId': userId, 'subscriptionId': subscriptionId})
 
     userInput = '{{"dns_name_label":"{}"}}'.format(dns_name_label)
     run_id = deploy(userInput=userInput)
-    trace_run_by_tags(run_id, tags={'endpointId': endpointId, 'userId': userId, 'subscriptionId': subscriptionId})
+    utils.WaitForRunCompletionByTags(experimentName, tags={'endpointId': endpointId, 'userId': userId, 'subscriptionId': subscriptionId})
 
     test_deployed_aci_service(data=test_data['real_time_scoring_input'], expected_output=test_data['real_time_scoring_expected_output'])

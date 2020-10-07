@@ -51,6 +51,8 @@ entry_points:
       deploymentName: {type: string, default: 'default'}
       apiVersion: {type: string, default: 'default'}
       subscriptionId: {type: string, default: 'default'}
+      deploymentTarget: {type: string, default: 'default'}
+      aksCluster: {type: string, default: 'default'}
     successros:
     verb: deploy
     noun: endpoints

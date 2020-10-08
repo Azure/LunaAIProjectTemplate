@@ -8,8 +8,8 @@ code:
   inference_entry_script: 'src/luna_publish/score.py'
 azureml:
   run_config: .cloud/.azureml/aml_run_config.yml
-  test_workspace_path: .cloud/.azureml
-  test_workspace_file_name: test_workspace.json
+  workspace_config_path: .cloud/.azureml
+  workspace_config_file_name: workspace.json
 mlflow:
   spark_config: .cloud/.mlflow/spark_config.json
   workspace_config: .cloud/.mlflow/compute.yml

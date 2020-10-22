@@ -4,7 +4,7 @@ from azureml.pipeline.core import Pipeline
 from azureml.core import Workspace
 from azureml.pipeline.core.graph import PipelineParameter
 from azureml.core import Experiment
-from azureml.core.webservice import AciWebservice, AksWebservice
+from azureml.core.webservice import AciWebservice, AksWebservice, Webservice
 
 from azureml.core.runconfig import RunConfiguration
 from azureml.core.conda_dependencies import CondaDependencies
@@ -35,8 +35,9 @@ dns_name_label = 'testlabel'
 utils = None
 
 def init(test_data_file):
-    global modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data
+    global modelId, endpointId, operationId, subscriptionId, dns_name_label, test_data, utils, ws
     utils = ProjectUtils(luna_config_file='luna_config.yml', run_mode='default')
+    ws = Workspace.from_config(path=utils.luna_config['azureml']['workspace_config_path'], _file_name=utils.luna_config['azureml']['workspace_config_file_name'])
     modelId = str('a' + uuid4().hex[1:])
     endpointId = str('a' + uuid4().hex[1:])
     operationId = str('a' + uuid4().hex[1:])
@@ -100,7 +101,7 @@ def deploy(userInput='{"dns_name_label":"testlabel"}'):
                                     experiment_name = experimentName, 
                                     parameters={'userId': userId,
                                                 'userInput': userInput, 
-                                                'operationId': operationId,
+                                                'operationId': endpointId,
                                                 'productName': productName,
                                                 'deploymentName': deploymentName,
                                                 'apiVersion': apiVersion,
@@ -116,15 +117,18 @@ def deploy(userInput='{"dns_name_label":"testlabel"}'):
     print(run_id)
     return run_id
 
-def test_deployed_aci_service(data, expected_output):
-    webservice = AciWebservice(ws, endpointId)
+def test_deployed_endpoint(data, expected_output):
+    
+    tags = [['userId', userId], ['endpointId', endpointId], ['subscriptionId', subscriptionId]]
+    endpoints = Webservice.list(ws, tags = tags)
+    endpoint = endpoints[0]
     headers = {'Content-Type': 'application/json'}
-    headers['Authorization'] = 'Bearer '+webservice.get_keys()[0]
+    headers['Authorization'] = 'Bearer '+endpoint.get_keys()[0]
 
     test_sample = json.dumps(data)
 
     response = requests.post(
-    webservice.scoring_uri, data=test_sample, headers=headers)
+    endpoint.scoring_uri, data=test_sample, headers=headers)
     if response.status_code != 200:
         raise Exception('The service return non-success status code: {}'.format(response.status_code))
     if response.json() != expected_output:
@@ -154,4 +158,4 @@ if __name__ == "__main__":
     run_id = deploy(userInput=userInput)
     utils.WaitForRunCompletionByTags(experimentName, tags={'endpointId': endpointId, 'userId': userId, 'subscriptionId': subscriptionId})
 
-    test_deployed_aci_service(data=test_data['real_time_scoring_input'], expected_output=test_data['real_time_scoring_expected_output'])
+    test_deployed_endpoint(data=test_data['real_time_scoring_input'], expected_output=test_data['real_time_scoring_expected_output'])
